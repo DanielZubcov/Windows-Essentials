@@ -73,7 +73,8 @@ def handle_gpu_driver_installation(vendor):
             print("[INFO] Running NVIDIA installer...")
         except Exception as e:
             print(f"[ERROR] Failed to download NVIDIA installer: {e}")
-            print("[INFO] Please install the drivers manually from the NVIDIA website.")
+            print("[INFO] Please install the drivers manually from the NVIDIA website link below: ")
+            print("[LINK] https://us.download.nvidia.com/nvapp/client/11.0.3.232/NVIDIA_app_v11.0.3.232.exe")
             return
         # Run the installer with subprocess after downloading
         try:
@@ -81,13 +82,20 @@ def handle_gpu_driver_installation(vendor):
             print("[OK] NVIDIA driver installed successfully.")
         except subprocess.CalledProcessError as e:
             print(f"[ERROR] Failed to run NVIDIA installer: {e}")
-            print("[INFO] Please install the drivers manually from the NVIDIA website.")
+            print("[INFO] Please install the drivers manually from the NVIDIA website link below: ")
+            print("[LINK] https://us.download.nvidia.com/nvapp/client/11.0.3.232/NVIDIA_app_v11.0.3.232.exe")
+            return
     
     elif vendor == "AMD":
         # Open browser to download AMD drivers cuz autistic micro device don't let me download directly
         print("[INFO] AMD installer can't be downloaded directly. Opening browser...")
-        webbrowser.open("https://www.amd.com/en/support")
-
+        try:
+            webbrowser.open("https://www.amd.com/en/support")
+        except Exception as e:
+            print(f"[ERROR] Failed to open browser for AMD drivers: {e}")
+            print("[INFO] Please install the drivers manually from the AMD website link below: ")
+            print("[LINK] https://www.amd.com/en/support")
+            return
     elif vendor == "Intel":
         # shIntel don't install drivers, just a SPYWARE to know my components
         print("[INFO] Downloading Intel Support Assistant...")
@@ -98,7 +106,8 @@ def handle_gpu_driver_installation(vendor):
             print("[INFO] Running Intel Support Assistant installer...")
         except Exception as e:
             print(f"[ERROR] Failed to download Intel Support Assistant: {e}")
-            print("[INFO] Please install the drivers manually from the Intel website.")
+            print("[INFO] Please install the drivers manually from the Intel website link below: ")
+            print("[LINK] https://downloadmirror.intel.com/28425/a08/Intel-Driver-and-Support-Assistant-Installer.exe")
             return
         # Run the installer with subprocess after downloading
         try:
@@ -106,7 +115,9 @@ def handle_gpu_driver_installation(vendor):
             print("[OK] Intel Support Assistant installed successfully.")
         except subprocess.CalledProcessError as e:
             print(f"[ERROR] Failed to run Intel Support Assistant installer: {e}")
-            print("[INFO] Please install the drivers manually from the Intel website.")
+            print("[INFO] Please install the drivers manually from the Intel website link below: ")
+            print("[LINK] https://downloadmirror.intel.com/28425/a08/Intel-Driver-and-Support-Assistant-Installer.exe")
+            return
     elif vendor == "unknown":
         print("[WARNING] Unknown GPU vendor. Please install drivers manually.")
     elif vendor == "":
@@ -119,8 +130,12 @@ def install_directx(installer_path):
     os.makedirs(extract_dir, exist_ok=True)
 
     # Extract files
-    subprocess.run([installer_path, "/Q", f"/T:{extract_dir}"], check=True)
-
+    try:
+        subprocess.run([installer_path, "/Q", f"/T:{extract_dir}"], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"[ERROR] Failed to extract DirectX installer: {e}")
+        return
+    print("[OK] DirectX installer extracted as DXSETUP.exe.")
     # Runs real installer
     dxsetup_path = os.path.join(extract_dir, "DXSETUP.exe")
     if os.path.exists(dxsetup_path):
@@ -171,9 +186,6 @@ def main():
         sys.exit(0)
     elif resp == "y":
         print("[INFO] User requested to continue.")
-        # Installs GPU Driver
-        handle_gpu_driver_installation(vendor)
-        
         # Installs DirectX
         install_directx(INSTALLERS["directx"])
 
@@ -187,8 +199,8 @@ def main():
         else:
             print("[WARNING] Unknown architecture for Visual C++.")
 
-
-        
+        # Installs GPU Driver
+        handle_gpu_driver_installation(vendor)
 
 # Admin check function
 def run_as_admin():
