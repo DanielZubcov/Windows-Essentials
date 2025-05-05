@@ -4,10 +4,10 @@ Instalador completo pós-formatação para Windows 10/11.
 
 ## Funcionalidades
 
-- Instala DirectX, .NET Framework, Visual C++ Redistributables
+- Instala DirectX, .NET Framework, Visual C++ Redistributables (e outros, só falta implementar)
 - Detecta automaticamente drivers de vídeo (NVIDIA, AMD, Intel)
-- Interface amigável estilo "wizard"
-- Suporte offline (instaladores embutidos)
+- Interface amigável estilo "wizard" (ainda precisa ser implementado)
+- Suporte offline (instaladores embutidos, com exceção dos drivers de video)
 
 ## Requisitos
 
