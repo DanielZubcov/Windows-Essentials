@@ -1,0 +1,9 @@
+customtkinter (eventually)
+os
+platform
+subprocess
+sys
+ctypes
+wmi
+urllib
+webbrowser
