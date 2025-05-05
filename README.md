@@ -18,7 +18,7 @@ Instalador completo pós-formatação para Windows 10/11.
 1. Baixe o zip do repo
 2. extraia tudo numa pasta
 3. instale via PIP os [requisitos](required_libs.txt)
-4. Dentro da pasta que contém a [main](src/main.py) execute ´´´python main.py´´´
+4. Dentro da pasta que contém a [main](src/main.py) execute ```python main.py```
 
 ## Como usar (Versão final)
 
