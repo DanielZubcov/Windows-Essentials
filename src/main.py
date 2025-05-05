@@ -63,14 +63,26 @@ def detect_gpu_vendor():
 
 # Autoinstall GPU Driver
 def handle_gpu_driver_installation(vendor):
+
     if vendor == "Nvidia":
         print("[INFO] Downloading NVIDIA driver installer...")
         url = "https://us.download.nvidia.com/nvapp/client/11.0.3.232/NVIDIA_app_v11.0.3.232.exe"
         filename = os.path.join("installers", "NVIDIA_app_v11.0.3.232.exe")
-        urllib.request.urlretrieve(url, filename)
-        print("[INFO] Running NVIDIA installer...")
-        subprocess.run([filename], check=True)
-
+        try:
+            urllib.request.urlretrieve(url, filename)
+            print("[INFO] Running NVIDIA installer...")
+        except Exception as e:
+            print(f"[ERROR] Failed to download NVIDIA installer: {e}")
+            print("[INFO] Please install the drivers manually from the NVIDIA website.")
+            return
+        # Run the installer with subprocess after downloading
+        try:
+            subprocess.run([filename], check=True)
+            print("[OK] NVIDIA driver installed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"[ERROR] Failed to run NVIDIA installer: {e}")
+            print("[INFO] Please install the drivers manually from the NVIDIA website.")
+    
     elif vendor == "AMD":
         # Open browser to download AMD drivers cuz autistic micro device don't let me download directly
         print("[INFO] AMD installer can't be downloaded directly. Opening browser...")
@@ -81,12 +93,24 @@ def handle_gpu_driver_installation(vendor):
         print("[INFO] Downloading Intel Support Assistant...")
         url = "https://downloadmirror.intel.com/28425/a08/Intel-Driver-and-Support-Assistant-Installer.exe"
         filename = os.path.join("installers", "Intel-Driver-and-Support-Assistant-Installer.exe")
-        urllib.request.urlretrieve(url, filename)
-        print("[INFO] Running Intel Support Assistant installer...")
-        subprocess.run([filename], check=True)
-
-    else:
-        print("[WARNING] GPU vendor not supported or not detected.")
+        try:
+            urllib.request.urlretrieve(url, filename)
+            print("[INFO] Running Intel Support Assistant installer...")
+        except Exception as e:
+            print(f"[ERROR] Failed to download Intel Support Assistant: {e}")
+            print("[INFO] Please install the drivers manually from the Intel website.")
+            return
+        # Run the installer with subprocess after downloading
+        try:
+            subprocess.run([filename], check=True)
+            print("[OK] Intel Support Assistant installed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"[ERROR] Failed to run Intel Support Assistant installer: {e}")
+            print("[INFO] Please install the drivers manually from the Intel website.")
+    elif vendor == "unknown":
+        print("[WARNING] Unknown GPU vendor. Please install drivers manually.")
+    elif vendor == "":
+        print("[WARNING] No GPU detected. Please install drivers manually.")
 
 # Install DirectX (requires proper installation function cuz idk lol, some shitty macrohard idea)
 def install_directx(installer_path):
@@ -101,7 +125,11 @@ def install_directx(installer_path):
     dxsetup_path = os.path.join(extract_dir, "DXSETUP.exe")
     if os.path.exists(dxsetup_path):
         print("[INFO] Running DXSETUP...")
-        subprocess.run([dxsetup_path, "/silent"], check=True)
+        try:
+            subprocess.run([dxsetup_path, "/silent"], check=True)
+            print("[OK] DirectX installed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"[ERROR] Failed to run DXSETUP: {e}")
     else:
         print("[ERRO] DXSETUP.exe not found after extraction.")
 
@@ -118,7 +146,7 @@ def run_installers(path, name=""):
         subprocess.run([path,"/quiet", "/norestart"], check=True)
         print(f"[OK] {name} Succefully installed.")
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Fail during installation {name}: {e}")
+        print(f"[ERROR] Failed during installation {name}: {e}")
 
 # main function
 def main():
@@ -132,21 +160,35 @@ def main():
     vendor = detect_gpu_vendor()
     print(f"[INFO] GPU Vendor detected: {vendor}")
     
-    # Installs DirectX
-    install_directx(INSTALLERS["directx"])
-
-    # Installs .NET Framework
-    run_installers(INSTALLERS["dotnet"], ".NET Framework")
-
-    # Installs Visual C++ Redistributable by architecture
-    vc_path = INSTALLERS["vc_redist"].get(arch)
-    if vc_path:
-        run_installers(vc_path, f"Visual C++ ({arch})")
-    else:
-        print("[WARNING] Unknown architecture for Visual C++.")
+    # Check if user wants to continue
+    print("Type [Y] or [Q] to quit.")
+    resp = input().lower()
+    if resp == "q":
+        print("[INFO] User requested to quit.")
+        sys.exit(0)
+    elif resp != "y":
+        print("[INFO] User requested to quit.")
+        sys.exit(0)
+    elif resp == "y":
+        print("[INFO] User requested to continue.")
+        # Installs GPU Driver
+        handle_gpu_driver_installation(vendor)
         
-    # Installs GPU Driver
-    handle_gpu_driver_installation(vendor)
+        # Installs DirectX
+        install_directx(INSTALLERS["directx"])
+
+        # Installs .NET Framework
+        run_installers(INSTALLERS["dotnet"], ".NET Framework")
+
+        # Installs Visual C++ Redistributable by architecture
+        vc_path = INSTALLERS["vc_redist"].get(arch)
+        if vc_path:
+            run_installers(vc_path, f"Visual C++ ({arch})")
+        else:
+            print("[WARNING] Unknown architecture for Visual C++.")
+
+
+        
 
 # Admin check function
 def run_as_admin():
@@ -161,7 +203,7 @@ def run_as_admin():
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, f'"{script}" {params}', None, 1)
             sys.exit()
         except Exception as e:
-            print(f"[ERRO] Fail to request adminitrator privileges: {e}")
+            print(f"[ERRO] Failed to request adminitrator privileges: {e}")
             sys.exit(1)
 
 if __name__ == "__main__":
