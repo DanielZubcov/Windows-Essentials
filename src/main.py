@@ -75,6 +75,8 @@ def handle_gpu_driver_installation(vendor):
             print(f"[ERROR] Failed to download NVIDIA installer: {e}")
             print("[INFO] Please install the drivers manually from the NVIDIA website link below: ")
             print("[LINK] https://us.download.nvidia.com/nvapp/client/11.0.3.232/NVIDIA_app_v11.0.3.232.exe")
+            print("[INFO] Press any key to exit.")
+            resp = input()
             return
         # Run the installer with subprocess after downloading
         try:
@@ -84,6 +86,8 @@ def handle_gpu_driver_installation(vendor):
             print(f"[ERROR] Failed to run NVIDIA installer: {e}")
             print("[INFO] Please install the drivers manually from the NVIDIA website link below: ")
             print("[LINK] https://us.download.nvidia.com/nvapp/client/11.0.3.232/NVIDIA_app_v11.0.3.232.exe")
+            print("[INFO] Press any key to exit.")
+            resp = input()            
             return
     
     elif vendor == "AMD":
@@ -95,6 +99,8 @@ def handle_gpu_driver_installation(vendor):
             print(f"[ERROR] Failed to open browser for AMD drivers: {e}")
             print("[INFO] Please install the drivers manually from the AMD website link below: ")
             print("[LINK] https://www.amd.com/en/support")
+            print("[INFO] Press any key to exit.")
+            resp = input()
             return
     elif vendor == "Intel":
         # shIntel don't install drivers, just a SPYWARE to know my components
@@ -108,6 +114,8 @@ def handle_gpu_driver_installation(vendor):
             print(f"[ERROR] Failed to download Intel Support Assistant: {e}")
             print("[INFO] Please install the drivers manually from the Intel website link below: ")
             print("[LINK] https://downloadmirror.intel.com/28425/a08/Intel-Driver-and-Support-Assistant-Installer.exe")
+            print("[INFO] Press any key to exit.")
+            resp = input()
             return
         # Run the installer with subprocess after downloading
         try:
@@ -117,6 +125,8 @@ def handle_gpu_driver_installation(vendor):
             print(f"[ERROR] Failed to run Intel Support Assistant installer: {e}")
             print("[INFO] Please install the drivers manually from the Intel website link below: ")
             print("[LINK] https://downloadmirror.intel.com/28425/a08/Intel-Driver-and-Support-Assistant-Installer.exe")
+            print("[INFO] Press any key to exit.")
+            resp = input()
             return
     elif vendor == "unknown":
         print("[WARNING] Unknown GPU vendor. Please install drivers manually.")
