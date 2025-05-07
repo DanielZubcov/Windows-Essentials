@@ -225,24 +225,34 @@ def main():
 # Admin check function
 def run_as_admin():
     # Request admin privileges cuz they think im gonna clone your wallet or install a ransonware
-    if ctypes.windll.shell32.IsUserAnAdmin():
+    try:
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+    except Exception as e:
+        print(f"[ERRO] Failed to check admin privileges: {e}")
+        return False
+    if is_admin:
         return True
     else:
         print("[INFO] Elevating privileges...")
         script = os.path.abspath(sys.argv[0])
         params = " ".join([f'"{arg}"' for arg in sys.argv[1:]])
         try:
-            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, f'"{script}" {params}', None, 1)
-            sys.exit()
+            ret = ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, f'"{script}" {params}', None, 1
+            )
+            if int(ret) <= 32:
+                print("[ERRO] Failed to elevate privileges.")
+                sys.exit(1)
         except Exception as e:
             print(f"[ERRO] Failed to request adminitrator privileges: {e}")
             sys.exit(1)
-
+        sys.exit(0)
 if __name__ == "__main__":
     if not sys.platform.startswith("win"):
         print("This installer only runs on Windows.")
         sys.exit(1)
     if not run_as_admin():
-        sys.exit(0)
-
-    main()
+        sys.exit(1)
+    if run_as_admin():
+        print("[INFO] Running as administrator.")
+        main()
